@@ -115,10 +115,6 @@ pnpm typechain
 
 STEP 3: Could not get local node working, so all deployments and tests are done against testnet
 
-```
-
-```
-
 Deploy on testnet: 
 
 ```
