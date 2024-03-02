@@ -1,6 +1,6 @@
 ![alt text](images/cover.png)
 
-# Stealth Command: The Hidden Fronts
+# Stealth Command: The Hidden Fronts (INCO Flavor)
 
 ### Table of Contents
 
@@ -14,6 +14,7 @@
     + [Future Version of the game - ZK + FHE](#future-version-of-the-game---zk---fhe)
     + [How to run these contracts](#how-to-run-these-contracts)
     + [Implementation Progress](#implementation-progress)
+    + [Deployed Contract](#deployed-contract-address-in-inco)
 
 
 ## Background:
@@ -90,3 +91,53 @@ Moreover, as the battle game logic becomes more complicated, it might be prudent
 FHE excels in privacy and encryption, and ZK is good for verifiable off-chain computation.
 
 ![alt text](images/meme.png)
+
+### How to run these contracts (Inco Network)
+
+STEP 1: clone & install dependencies
+
+```
+git clone https://github.com/Switch-Labs/stealth_command_inco.git
+cd stealth_command_inco
+pnpm install
+```
+
+STEP 2: compile and generate types
+```
+pnpm compile
+pnpm typechain
+```
+
+STEP 3: Could not get local node working, so all deployments and tests are done against testnet
+
+```
+
+```
+
+Deploy on testnet: 
+
+```
+pnpm deploy:contracts --network inco
+```
+
+Finally run the tests! 
+
+Make sure attacker and defender accounts have tokens for gas!! 
+
+```
+pnpm hardhat --network inco test
+```
+
+### Implementation Progress
+
+* :white_check_mark: Successfully import ZK logic to FHE
+* :white_check_mark: Compile Contracts
+* :white_check_mark: Deploy Contract Locally
+* :white_check_mark: Deploy Contract in Testnet
+* :white_check_mark: Add Unit Tests
+* :white_check_mark: End to End testing for battles
+* :x: UI 
+
+
+### Deployed Contract Address in INCO
+0x14fAa5686cC9bc489666295Fef570ab96afCf179
