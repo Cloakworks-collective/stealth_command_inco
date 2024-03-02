@@ -1,284 +1,92 @@
-# Hardhat Template [![Open in Gitpod][gitpod-badge]][gitpod] [![Github Actions][gha-badge]][gha] [![Hardhat][hardhat-badge]][hardhat] [![License: MIT][license-badge]][license]
+![alt text](images/cover.png)
 
-[gitpod]: https://gitpod.io/#https://github.com/inco-fhevm/fhevm-hardhat-template
-[gitpod-badge]: https://img.shields.io/badge/Gitpod-Open%20in%20Gitpod-FFB45B?logo=gitpod
-[gha]: https://github.com/inco-fhevm/fhevm-hardhat-template/actions
-[gha-badge]: https://github.com/inco-fhevm/fhevm-hardhat-template/actions/workflows/ci.yml/badge.svg
-[hardhat]: https://hardhat.org/
-[hardhat-badge]: https://img.shields.io/badge/Built%20with-Hardhat-FFDB1C.svg
-[license]: https://opensource.org/licenses/MIT
-[license-badge]: https://img.shields.io/badge/License-MIT-blue.svg
+# Stealth Command: The Hidden Fronts
 
-A Hardhat-based template for developing Solidity smart contracts, with sensible defaults.
+### Table of Contents
 
-- [Hardhat](https://github.com/nomiclabs/hardhat): compile, run and test smart contracts
-- [TypeChain](https://github.com/ethereum-ts/TypeChain): generate TypeScript bindings for smart contracts
-- [Ethers](https://github.com/ethers-io/ethers.js/): renowned Ethereum library and wallet implementation
-- [Solhint](https://github.com/protofire/solhint): code linter
-- [Solcover](https://github.com/sc-forks/solidity-coverage): code coverage
-- [Prettier Plugin Solidity](https://github.com/prettier-solidity/prettier-plugin-solidity): code formatter
+- [Stealth Command: The Hidden Fronts](#stealth-command--the-hidden-fronts)
+  * [Background:](#background)
+  * [Art of war - an introduction to "Stealth Command".](#art-of-war---an-introduction-to--stealth-command)
+  * [Comparison of ZK and FHE implementation](#comparison-of-zk-and-fhe-implementation)
+    + [How it worked in ZK:](#how-it-worked-in-zk)
+    + [How it works with FHE](#how-it-works-with-fhe)
+    + [Advantages of using FHE:](#advantages-of-using-fhe)
+    + [Future Version of the game - ZK + FHE](#future-version-of-the-game---zk---fhe)
+    + [How to run these contracts](#how-to-run-these-contracts)
+    + [Implementation Progress](#implementation-progress)
 
-## Getting Started
 
-Click the [`Use this template`](https://github.com/inco-fhevm/fhevm-hardhat-template/generate) button at the top of the
-page to create a new repository with this repo as the initial state.
+## Background:
 
-## Features
+The initial edition of the game ["Shadow Warfare: Cities Under Siege"](https://ethglobal.com/showcase/shadow-warfare-gxvty) was developed during EthGlobal's Circuitbreaker hackathon of February 2024. The game logic contracts and the proof verification contracts were deployed on Scroll, the game's circuits were implemented in Noir. ZK circuits were integral for ensuring both privacy, simulating a "fog of war" effect, and scalability, through off-chain computation of the battle logic.
 
-This template builds upon the frameworks and libraries mentioned above, so for details about their specific features,
-please consult their respective documentations.
 
-For example, for Hardhat, you can refer to the [Hardhat Tutorial](https://hardhat.org/tutorial) and the
-[Hardhat Docs](https://hardhat.org/docs). You might be in particular interested in reading the
-[Testing Contracts](https://hardhat.org/tutorial/testing-contracts) section.
+"Stealth Command: The Hidden Fronts" is a revamped version of the game, now employing Fully Homomorphic Encryption (FHE) for encryption and privacy, in place of ZK. This project serves as an investigation into the comparative effectiveness of ZK and FHE. In this iteration, game state computation is executed on-chain, to keep things simple.
 
-### Sensible Defaults
-
-This template comes with sensible default configurations in the following files:
-
-```text
-├── .editorconfig
-├── .eslintignore
-├── .eslintrc.yml
-├── .gitignore
-├── .prettierignore
-├── .prettierrc.yml
-├── .solcover.js
-├── .solhint.json
-└── hardhat.config.ts
+```
+Note: This (FHE) implementation was built from scratch for this ETH Denver BUIDL week. The older (ZK)implementation is referred for a comparative study.
 ```
 
-### VSCode Integration
+## Art of war - an introduction to "Stealth Command".
 
-This template is IDE agnostic, but for the best user experience, you may want to use it in VSCode alongside Nomic
-Foundation's [Solidity extension](https://marketplace.visualstudio.com/items?itemName=NomicFoundation.hardhat-solidity).
+In this game, each participant assumes ownership of a city upon joining. Immediately, they are tasked with commanding and fortifying their city, ensuring its defenses remain confidential. The defense mechanisms are encrypted and stored on-chain as hashes, representing the city's defenses. Conversely, when attacking, players utilize a public army, with battle computations carried out entirely on-chain using encrypted data to keep city's defense private through the Homomorphic Encryption over the Torus (TFHE) library.
 
-### GitHub Actions
+A unique aspect of the game is the controlled leak of information based on the defending army's performance—either holding or losing the city. This feature introduces a layer of strategic depth, allowing players to analyze defense histories and make informed predictions about city defenses, akin to real-world military strategies.
 
-This template comes with GitHub Actions pre-configured. Your contracts will be linted and tested on every push and pull
-request made to the `main` branch.
+Furthermore, to maintain fairness and adherence to the game's rules, both attacking and defending armies undergo on-chain verification. This process ensures all players comply with the established guidelines, preventing any form of cheating and preserving the game's integrity.
 
-Note though that to make this work, you must use your `INFURA_API_KEY` and your `MNEMONIC` as GitHub secrets.
+## Comparison of ZK and FHE implementation 
 
-You can edit the CI script in [.github/workflows/ci.yml](./.github/workflows/ci.yml).
+Before we can compare ZK vs FHE, we must explain how the game worked in ZK: 
 
-## Usage
+### How it worked in ZK:
+<br>
 
-### Pre Requisites
+![alt text](images/zk-step-1.png)
 
-Install [docker](https://docs.docker.com/engine/install/)
+In Step 1, Player 1 sets up his defense for the city, which is kept private. Only the defense hash is stored on-chain to keep him honest, and to make sure he cannot change it later.
 
-Install [pnpm](https://pnpm.io/installation)
+![alt text](images/zk-step-2.png)
 
-Before being able to run any command, you need to create a `.env` file and set a BIP-39 compatible mnemonic as an
-environment variable. You can follow the example in `.env.example`. If you don't already have a mnemonic, you can use
-this [website](https://iancoleman.io/bip39/) to generate one.
+In Step 2, Player 2 attacks the city of Player 1. The attacking army composition is Public.  
 
-Then, proceed with installing dependencies:
+![alt text](images/zk-step-3.png)
 
-```sh
-pnpm install
-```
+In Step 3, Player 1 computes the battle result off-chain, and generates a proof of that computation along with the result. 
+The Proof is verified on-chain and the result is stored on-chain.  
 
-### Start fhevm
+![alt text](images/zk-step-4.png)
 
-Start a local fhevm docker container that inlcudes everything needed to deploy FHE encrypted smart contracts
+In Optional Step 4, in case Player 1 ghosts, we let Player 2 collect forfeir (loot city) aafter a certain time period.
 
-```sh
-# In one terminal, keep it opened
-# The node logs are printed
-pnpm fhevm:start
-```
+### How it works with FHE 
+<br>
 
-To stop:
+Using FHE is a much simpler developer experience:
 
-```sh
-pnpm fhevm:stop
-```
+In Step 1, Player 1 generates a cyphertext for his/her defense using the fhevm.js library on the client computer, and then pass it on as a calldata on to the deployed smart contract, where it is verified and stored as ecrypted data.
 
-### Compile
+![alt text](images/fhe-step-1.png)
 
-Compile the smart contracts with Hardhat:
+In Step 2, Player 2 attacks the city publicly. Since the data is already on-chain and we can compute with encrypted data, the battle is computed on-chain.
 
-```sh
-pnpm compile
-```
+![alt text](images/fhe-step-2.png)
 
-### TypeChain
 
-Compile the smart contracts and generate TypeChain bindings:
+### Advantages of using FHE: 
 
-```sh
-pnpm typechain
-```
+As you can see, it was much easier and straightforward to use FHE. we could implement the same game in two simple steps instead of four:
 
-### List accounts
+We also eliminated the need of Player 1 (the defender) having to compute the battle and generate the proof - improving user experience.
 
-From the mnemonic in .env file, list all the derived Ethereum adresses:
+Moreover, we also eliminated the need of off-chain storage.All states stay on-chain and we can scale the game easily for a true on-chain multiplayer experience.
 
-```sh
-pnpm task:accounts
-```
+### Future Version of the game - ZK + FHE 
 
-### Get some native coins
+Does this mean FHE replaces all things ZK? The answer is no. Even the TFHE library uses ZK proofs verification of incoming cyphertexts underneath the hood before storing the encrypted data on-chain. 
 
-In order to interact with the blockchain, one need some coins. This command will give coins to the first address derived
-from the mnemonic in .env file.
+Moreover, as the battle game logic becomes more complicated, it might be prudent to move that out for off-chain computation to save on gas fees, where we can generate a ZK proof of that battle on client computer, and verify the result on-chain. We can make the battle a lot more computationally intensive that way. 
 
-```sh
-pnpm fhevm:faucet
-```
+FHE excels in privacy and encryption, and ZK is good for verifiable off-chain computation.
 
-<br />
-<details>
-  <summary>To get the first derived address from mnemonic</summary>
-<br />
-
-```sh
-pnpm task:getEthereumAddress
-```
-
-</details>
-<br />
-
-### Deploy
-
-Deploy the ERC20 to local network:
-
-```sh
-pnpm deploy:contracts
-```
-
-Notes: <br />
-
-<details>
-<summary>Error: cannot get the transaction for EncryptedERC20's previous deployment</summary>
-
-One can delete the local folder in deployments:
-
-```bash
-rm -r deployments/local/
-```
-
-</details>
-
-<details>
-<summary>Info: by default, the local network is used</summary>
-
-One can change the network, check [hardhat config file](./hardhat.config.ts).
-
-</details>
-<br />
-
-#### Mint
-
-Run the `mint` task on the local network:
-
-```sh
-pnpm task:mint --network local --mint 1000 --account alice
-```
-
-### Test
-
-Run the tests with Hardhat:
-
-```sh
-pnpm test
-```
-
-### Lint Solidity
-
-Lint the Solidity code:
-
-```sh
-pnpm lint:sol
-```
-
-### Lint TypeScript
-
-Lint the TypeScript code:
-
-```sh
-pnpm lint:ts
-```
-
-### Coverage
-
-Generate the code coverage report:
-
-```sh
-pnpm coverage
-```
-
-### Report Gas
-
-See the gas usage per unit test and average gas per method call:
-
-```sh
-REPORT_GAS=true pnpm test
-```
-
-### Clean
-
-Delete the smart contract artifacts, the coverage reports and the Hardhat cache:
-
-```sh
-pnpm clean
-```
-
-### Tasks
-
-#### Deploy EncryptedERC20
-
-Deploy a new instance of the EncryptedERC20 contract via a task:
-
-```sh
-pnpm task:deployERC20
-```
-
-## Tips
-
-### Increase gas limit
-
-If you are running several fhe operations and need to have more gas per block, here is a way to customize your local
-node setup.
-
-1. Copy docker setup.sh file
-
-```bash
-docker cp fhevm:/config/setup.sh .
-```
-
-2. Increase the gas limit from 10M to 100M for example in setup.sh
-
-```bash
-cat $HOME_EVMOSD/config/genesis.json | jq '.consensus_params["block"]["max_gas"]="10000000"' > $HOME_EVMOSD/config/tmp_genesis.json && mv $HOME_EVMOSD/config/tmp_genesis.json $HOME_EVMOSD/config/genesis.json
-```
-
-3. Run the dev image with the custom setup.sh file
-
-```bash
-docker run -i -v $PWD/setup.sh:/config/setup.sh -p 8545:8545 --rm --name fhevm docker.io/inconetwork/inco-chain:0.1.9.1-hardhat-template
-```
-
-Note: one can also replace fhevm:start in package.json with the above command
-
-### Syntax Highlighting
-
-If you use VSCode, you can get Solidity syntax highlighting with the
-[hardhat-solidity](https://marketplace.visualstudio.com/items?itemName=NomicFoundation.hardhat-solidity) extension.
-
-## Using GitPod
-
-[GitPod](https://www.gitpod.io/) is an open-source developer platform for remote development.
-
-To view the coverage report generated by `pnpm coverage`, just click `Go Live` from the status bar to turn the server
-on/off.
-
-## Local development with Docker
-
-Please check Evmos repository to be able to build FhEVM from sources.
-
-## License
-
-This project is licensed under MIT.
+![alt text](images/meme.png)
