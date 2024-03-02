@@ -2,6 +2,11 @@
 
 # Stealth Command: The Hidden Fronts (INCO Flavor)
 
+The same game contract with minor changes (based on library used) is deployed both on FHENIX and INCO (`@fhenixprotocol/contracts/FHE.sol` for FHENIX and `fhevm/lib/TFHE.sol` for INCO)
+
+* FHENIX SUBMISSION  - https://github.com/Switch-Labs/stealth_command
+* INCO SUBMISSION (This Repository) -  https://github.com/Switch-Labs/stealth_command_inco
+
 ### Table of Contents
 
 - [Stealth Command: The Hidden Fronts](#stealth-command--the-hidden-fronts)
